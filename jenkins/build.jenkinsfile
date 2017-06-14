@@ -1,0 +1,30 @@
+node {
+   def mvnHome
+   stage('Preparation') { // for display purposes
+      // Get some code from a GitHub repository
+      git branch: 'dev-0.2', credentialsId: 'git-dinner3000', url: 'https://git.coding.net/dinner3000/schoolpal.git'
+      // Get the Maven tool.
+      // ** NOTE: This 'M3' Maven tool must be configured
+      // **       in the global configuration.           
+      mvnHome = tool 'maven'
+      dockerHome = tool 'docker'
+   }
+   stage('Build - package') {
+    // Run the maven build
+    dir('src/site') {
+//        sh "pwd; ls -al"
+        sh "'${mvnHome}/bin/mvn' -Dmaven.test.skip=true clean package"
+    }
+   }
+   stage('Build - docker image') {
+    // Run the maven build
+    dir('deploy/docker_image') {
+//        sh "pwd; ls -al"
+        sh './build.sh dev-0.2 ${BUILD_NUMBER}'
+    }
+   }
+   stage('Results') {
+//      junit '**/target/surefire-reports/TEST-*.xml'
+      archive 'target/*.war'
+   }
+}

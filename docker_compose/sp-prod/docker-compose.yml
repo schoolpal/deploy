@@ -1,0 +1,19 @@
+version: '3'
+services:
+  nginx:
+    image: bj.dinner3000.com:5000/nginx:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+  web:
+    image: bj.dinner3000.com:5000/web:latest
+    ports:
+      - "7180:8080"
+    depends_on:
+      - db
+      - redis
+  redis:
+    image: bj.dinner3000.com:5000/redis-singleton:latest
+  db:
+    image: bj.dinner3000.com:5000/db:latest
