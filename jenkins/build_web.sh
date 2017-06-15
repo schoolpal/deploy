@@ -4,7 +4,10 @@ set -e
 
 MVN=/opt/maven/bin/mvn
 
-cd src/site
+cd web/src/site
+${MVN} -Dmaven.test.skip=true -Pdocker clean package
+cd -
+cd wechat
 ${MVN} -Dmaven.test.skip=true -Pdocker clean package
 cd -
 

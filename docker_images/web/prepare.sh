@@ -5,5 +5,6 @@ set -e
 WORKDIR=$( cd `dirname $0`; pwd )
 
 cd ${WORKDIR}
-cp -rf ../../../src/site/target/*.war ./
+cp -rf ../../../web/src/site/target/*.war ./
+cp -rf ../../../wechat/src/site/target/*.war ./
 
