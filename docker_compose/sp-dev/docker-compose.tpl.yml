@@ -1,20 +1,21 @@
 version: '2'
 services:
-#  nginx:
-#    image: dinner3000/nginx-dev:latest
-#    ports:
-#      - "72:80"
-#    volumes:
-#      - _VOLUME_HTML_:/usr/share/nginx/html:ro
-#      - _VOLUME_NGINXCONF_:/etc/nginx/nginx.conf:ro
-#    depends_on:
-#      - web
+  nginx:
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - _VOLUME_HTML_:/usr/share/nginx/html:ro
+      - _VOLUME_NGINXCONF_:/etc/nginx/nginx.conf:ro
+      - _VOLUME_LOGS_:/var/log/nginx
+    depends_on:
+      - web
   web:
     image: tomcat:9
     ports:
       - "8080:8080"
     volumes:
-      - _VOLUME_WEBAPPS_:/usr/local/tomcat/webapps:ro
+      - _VOLUME_WEBAPPS_:/usr/local/tomcat/webapps
       - _VOLUME_LOGS_:/usr/local/tomcat/logs
     depends_on:
       - db
@@ -34,3 +35,4 @@ services:
        - "3306:3306"
     volumes:
       - _VOLUME_INITSQL_:/docker-entrypoint-initdb.d:ro
+
