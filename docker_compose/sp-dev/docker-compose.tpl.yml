@@ -23,7 +23,7 @@ services:
   redis:
     image: redis:3
     ports:
-      - "6379:6379"
+#      - "6379:6379"
   db:
     image: mysql:5
     environment:
@@ -32,7 +32,7 @@ services:
       MYSQL_USER: schoolpal
       MYSQL_PASSWORD: schoolpal
     ports:
-       - "3306:3306"
+#       - "3306:3306"
     volumes:
       - _VOLUME_INITSQL_:/docker-entrypoint-initdb.d:ro
 
