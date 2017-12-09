@@ -14,7 +14,7 @@ VOLUME_NGINXCONF=nginx.conf
 VOLUME_DIRS="${VOLUME_INITSQL} ${VOLUME_WEBAPPS} ${VOLUME_HTML} ${VOLUME_CONF} ${VOLUME_LOGS}"
 
 GIT_REPO_TPL=https://github.com/schoolpal/_NAME_.git
-GIT_REPOS=(web-service data)
+GIT_REPOS=(web-static web-service data)
 
 DOCKER_COMPOSE_FILE_TPL=${WORK_DIR}/docker-compose.tpl.yml
 DOCKER_COMPOSE_FILE=${WORK_DIR}/docker-compose.yml
@@ -34,25 +34,27 @@ function git_update(){
     fi
 }
 
+function npm_build(){
+    cd ${DEPLOY_ROOT}/$1
+    npm install
+	npm run build
+    cd -
+}
+
 function mvn_build(){
     cd ${DEPLOY_ROOT}/$1
     mvn clean package -Pdocker
     cd -
 }
 
-function deploy_service(){
-#    rm -rfv $3/$2
-#    cp -rfv ${DEPLOY_ROOT}/$1/target/$2 $3/
-    cp -rfv ${DEPLOY_ROOT}/$1/target/*.war $2
+function deploy_static(){
+    rm -rfv $2/*
+    cp -rfv ${DEPLOY_ROOT}/$1/build/* $2/
 }
 
-function deploy_static(){
-    rm -rfv $3/*
-    mkdir -p $3/web
-    cp -rfv ${DEPLOY_ROOT}/$1/target/$2/html $3/web/
-    cp -rfv ${DEPLOY_ROOT}/$1/target/$2/html/* $3/
-    cp -rfv ${DEPLOY_ROOT}/$1/target/$2/ajax_ut $3/web/
-    cp -rfv ${DEPLOY_ROOT}/$1/target/$2/ajax_ut $3/
+function deploy_service(){
+	rm -rfv $2/*
+    cp -rfv ${DEPLOY_ROOT}/$1/target/*.war $2
 }
 
 ############################ Main process #################################
@@ -73,14 +75,19 @@ for R in ${GIT_REPOS[*]}; do
     git_update "${R}"
 done
 
+set -e
+echo "Build web-static ... "
+npm_build "web-static"
+
 echo "Build web-service ... "
 mvn_build "web-service"
-
-echo "Deploy services ... "
-deploy_service "web-service" "${DOCKER_VOLUME}/${VOLUME_WEBAPPS}"
+set +e
 
 echo "Deploy static files ... "
-deploy_static "web-service" "web" "${DOCKER_VOLUME}/${VOLUME_HTML}"
+deploy_static "web-static" "${DOCKER_VOLUME}/${VOLUME_HTML}"
+
+echo "Deploy service files ... "
+deploy_service "web-service" "${DOCKER_VOLUME}/${VOLUME_WEBAPPS}"
 
 echo "Deploy config files ... "
 rm -rf ${DOCKER_VOLUME}/${VOLUME_INITSQL}/*.sql
