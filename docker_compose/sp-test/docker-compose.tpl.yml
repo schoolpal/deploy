@@ -1,0 +1,38 @@
+version: '2'
+services:
+  nginx:
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - _VOLUME_HTML_:/usr/share/nginx/html:ro
+      - _VOLUME_NGINXCONF_:/etc/nginx/nginx.conf:ro
+      - _VOLUME_LOGS_:/var/log/nginx
+    depends_on:
+      - web
+  web:
+    image: tomcat:9
+    ports:
+      - "8080:8080"
+    volumes:
+      - _VOLUME_WEBAPPS_:/usr/local/tomcat/webapps
+      - _VOLUME_LOGS_:/usr/local/tomcat/logs
+    depends_on:
+      - db
+      - redis
+  redis:
+    image: redis:3
+    ports:
+#      - "6379:6379"
+  db:
+    image: mysql:5
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234abcd
+      MYSQL_DATABASE: schoolpal
+      MYSQL_USER: schoolpal
+      MYSQL_PASSWORD: schoolpal
+    ports:
+#       - "3306:3306"
+    volumes:
+      - _VOLUME_INITSQL_:/docker-entrypoint-initdb.d:ro
+
