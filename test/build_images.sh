@@ -6,16 +6,21 @@ WORK_DIR=$(cd "$(dirname "$0")"; pwd)
 DEPLOY_ROOT=${WORK_DIR}/../
 REPOS_DIR=${DEPLOY_ROOT}/repos
 
-DOCKER_VOLUME=/opt/docker-volume
-VOLUME_LOGS=logs
+PROJECT_NAME=schoolpal
+TS=`TZ=Asia/Shanghai date +%Y%m%d%H%M%S`
 
-VOLUME_DIRS="${VOLUME_LOGS}"
-
-IMAGE_DIR_NGINX=${WORK_DIR}/nginx
-IMAGE_DIR_TOMCAT=${WORK_DIR}/tomcat
-
-GIT_REPO_TPL=https://github.com/schoolpal/_NAME_.git
+GIT_REPO_TPL=https://github.com/${PROJECT_NAME}/_NAME_.git
 GIT_REPOS=(web-static web-service data)
+
+DOCKER_REPO=${PROJECT_NAME}
+DOCKER_USER=dinner3000
+DOCJER_PASS=1234abcd
+
+NGINX_IMG_NAME=nginx
+TOMCAT_IMG_NAME=tomcat
+
+NGINX_IMG_DIR=${WORK_DIR}/nginx
+TOMCAT_IMG_DIR=${WORK_DIR}/tomcat
 
 ############################ Functions #################################
 function git_update(){
@@ -44,27 +49,16 @@ function mvn_build(){
     cd -
 }
 
-TS=`TZ=Asia/Shanghai date +%Y%m%d%H%M%S`
 function docker_build(){
     cd $1
-    docker build -t schoolpal/$2:${TS} . 
-    docker tag schoolpal/$2:${TS} schoolpal/$2:latest
-    docker login --username=dinner3000 --password=1234abcd
-    docker push schoolpal/$2:${TS}
-    docker push schoolpal/$2:latest
-    docker logout
+    docker build -t ${PROJECT_NAME}/$2:${TS} . 
+    docker tag ${PROJECT_NAME}/$2:${TS} ${PROJECT_NAME}/$2:latest
+    docker push ${PROJECT_NAME}/$2:${TS}
+    docker push ${PROJECT_NAME}/$2:latest
     cd -
 }
 
 ############################ Main process #################################
-
-echo -n "Create volume dirs ... "
-mkdir -p ${DOCKER_VOLUME}
-cd ${DOCKER_VOLUME}
-for D in ${VOLUME_DIRS[*]}; do
-    mkdir -p ${D}
-done
-echo "done"
 
 echo "Get latest source code ... "
 mkdir -p ${REPOS_DIR}
@@ -77,17 +71,19 @@ done
 echo "Build web-static ... "
 npm_build "web-static"
 
+echo "Deploy static files ... "
+rm -rfv ${NGINX_IMG_DIR}/public || true
+cp -rfv ${REPOS_DIR}/web-static/public ${NGINX_IMG_DIR}/public
+
 echo "Build web-service ... "
 mvn_build "web-service"
 
-#echo "Deploy static files ... "
-rm -rfv ${IMAGE_DIR_NGINX}/public || true
-cp -rfv ${REPOS_DIR}/web-static/public ${IMAGE_DIR_NGINX}/public
+echo "Deploy service files ... "
+rm -rfv ${TOMCAT_IMG_DIR}/*.war || true
+cp -rfv ${REPOS_DIR}/web-service/target/*.war ${TOMCAT_IMG_DIR}/
 
-#echo "Deploy service files ... "
-rm -rfv ${IMAGE_DIR_TOMCAT}/*.war || true
-cp -rfv ${REPOS_DIR}/web-service/target/*.war ${IMAGE_DIR_TOMCAT}/
-
-#echo "Build docker images ... "
-docker_build "${IMAGE_DIR_NGINX}" "nginx"
-docker_build "${IMAGE_DIR_TOMCAT}" tomcat
+echo "Build docker images ... "
+docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
+docker_build "${NGINX_IMG_DIR}" "${NGINX_IMG_NAME}"
+docker_build "${TOMCAT_IMG_DIR}" ${TOMCAT_IMG_NAME}
+docker logout
