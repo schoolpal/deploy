@@ -22,11 +22,11 @@ function git_update(){
     if [ ! -d $1 ]; then
         REPO=`echo "${GIT_REPO_TPL}" | sed "s/_NAME_/"$1"/g"`
         git clone ${REPO}
-	    git checkout dev
+        git checkout dev || true
     else
 	cd $1
 	git pull --rebase -v
-	git checkout dev
+	git checkout dev || true
 	cd ..
     fi
 }
@@ -44,15 +44,15 @@ function mvn_build(){
     cd -
 }
 
-function deploy_files(){
-    rm -rfv $2/*
-    cp -rfv $1 $2/
-}
-
+TS=`TZ=Asia/Shanghai date +%Y%m%d%H%M%S`
 function docker_build(){
     cd $1
-    docker build -t schoolpal/$2 . 
-    docker push schoolpal/$2
+    docker build -t schoolpal/$2:${TS} . 
+    docker tag schoolpal/$2:${TS} schoolpal/$2:latest
+    docker login --username=dinner3000 --password=1234abcd
+    docker push schoolpal/$2:${TS}
+    docker push schoolpal/$2:latest
+    docker logout
     cd -
 }
 
@@ -81,11 +81,13 @@ echo "Build web-service ... "
 mvn_build "web-service"
 
 #echo "Deploy static files ... "
-deploy_files "${REPOS_DIR}/web-static/public" "${IMAGE_DIR_NGINX}"
+rm -rfv ${IMAGE_DIR_NGINX}/public || true
+cp -rfv ${REPOS_DIR}/web-static/public ${IMAGE_DIR_NGINX}/public
 
 #echo "Deploy service files ... "
-deploy_files "${REPOS_DIR}/web-service/target/*.war" "${IMAGE_DIR_TOMCAT}"
+rm -rfv ${IMAGE_DIR_TOMCAT}/*.war || true
+cp -rfv ${REPOS_DIR}/web-service/target/*.war ${IMAGE_DIR_TOMCAT}/
 
 #echo "Build docker images ... "
-docker_build "${IMAGE_DIR_NGINX}" nginx
+docker_build "${IMAGE_DIR_NGINX}" "nginx"
 docker_build "${IMAGE_DIR_TOMCAT}" tomcat
