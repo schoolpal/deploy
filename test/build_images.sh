@@ -14,7 +14,7 @@ GIT_REPOS=(web-static web-service data)
 
 DOCKER_REPO=${PROJECT_NAME}
 DOCKER_USER=dinner3000
-DOCJER_PASS=1234abcd
+DOCKER_PASS=1234abcd
 
 NGINX_IMG_NAME=nginx
 TOMCAT_IMG_NAME=tomcat
@@ -69,17 +69,18 @@ for R in ${GIT_REPOS[*]}; do
 done
 
 echo "Build web-static ... "
+rm -rf ${REPOS_DIR}/web-static/build/*
 npm_build "web-static"
 
 echo "Deploy static files ... "
-rm -rfv ${NGINX_IMG_DIR}/public || true
-cp -rfv ${REPOS_DIR}/web-static/public ${NGINX_IMG_DIR}/public
+rm -rf ${NGINX_IMG_DIR}/public || true
+cp -rfv ${REPOS_DIR}/web-static/build ${NGINX_IMG_DIR}/build
 
 echo "Build web-service ... "
 mvn_build "web-service"
 
 echo "Deploy service files ... "
-rm -rfv ${TOMCAT_IMG_DIR}/*.war || true
+rm -rf ${TOMCAT_IMG_DIR}/*.war || true
 cp -rfv ${REPOS_DIR}/web-service/target/*.war ${TOMCAT_IMG_DIR}/
 
 echo "Build docker images ... "
