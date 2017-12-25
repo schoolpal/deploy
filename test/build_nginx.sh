@@ -10,17 +10,15 @@ PROJECT_NAME=schoolpal
 TS=`TZ=Asia/Shanghai date +%Y%m%d%H%M%S`
 
 GIT_REPO_TPL=https://github.com/${PROJECT_NAME}/_NAME_.git
-GIT_REPOS=(web-static web-service data)
+GIT_REPOS=(web-static data)
 
 DOCKER_REPO=${PROJECT_NAME}
 DOCKER_USER=dinner3000
 DOCKER_PASS=1234abcd
 
 NGINX_IMG_NAME=nginx
-TOMCAT_IMG_NAME=tomcat
 
 NGINX_IMG_DIR=${WORK_DIR}/nginx
-TOMCAT_IMG_DIR=${WORK_DIR}/tomcat
 
 ############################ Functions #################################
 function git_update(){
@@ -40,12 +38,6 @@ function npm_build(){
     cd ${REPOS_DIR}/$1
     npm install
     npm run build
-    cd -
-}
-
-function mvn_build(){
-    cd ${REPOS_DIR}/$1
-    mvn clean package -Pdocker
     cd -
 }
 
@@ -76,15 +68,7 @@ echo "Deploy static files ... "
 rm -rf ${NGINX_IMG_DIR}/public || true
 cp -rfv ${REPOS_DIR}/web-static/build ${NGINX_IMG_DIR}/build
 
-echo "Build web-service ... "
-mvn_build "web-service"
-
-echo "Deploy service files ... "
-rm -rf ${TOMCAT_IMG_DIR}/*.war || true
-cp -rfv ${REPOS_DIR}/web-service/target/*.war ${TOMCAT_IMG_DIR}/
-
 echo "Build docker images ... "
 docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
 docker_build "${NGINX_IMG_DIR}" "${NGINX_IMG_NAME}"
-docker_build "${TOMCAT_IMG_DIR}" ${TOMCAT_IMG_NAME}
 docker logout
