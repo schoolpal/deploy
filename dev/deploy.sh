@@ -67,19 +67,16 @@ for R in ${GIT_REPOS[*]}; do
     git_update "${R}"
 done
 
-set -e
 echo "Build web-static ... "
 npm_build "web-static"
 
 echo "Build web-service ... "
 mvn_build "web-service"
-set +e
 
 echo "Deploy static files ... "
 rm -rfv ${DOCKER_VOLUME}/${VOLUME_HTML}/*
 cp -rfv ${REPOS_DIR}/web-static/build/* ${DOCKER_VOLUME}/${VOLUME_HTML}/
-cp -rfv ${REPOS_DIR}/web-service/target/web/static ${DOCKER_VOLUME}/${VOLUME_HTML}/
-
+cp -rfv ${REPOS_DIR}/web-service/target/web/static/tests ${DOCKER_VOLUME}/${VOLUME_HTML}/
 
 echo "Deploy service files ... "
 rm -rfv ${DOCKER_VOLUME}/${VOLUME_WEBAPPS}/*
