@@ -1,7 +1,7 @@
 version: '2'
 services:
   nginx:
-    image: nginx:stable
+    image: nginx:1.13
     ports:
       - "80:80"
     volumes:
