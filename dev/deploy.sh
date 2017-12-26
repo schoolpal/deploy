@@ -5,7 +5,7 @@ WORK_DIR=$(cd "$(dirname "$0")"; pwd)
 DEPLOY_ROOT=${WORK_DIR}/../
 REPOS_DIR=${DEPLOY_ROOT}/repos
 
-DOCKER_VOLUME=/opt/docker-volume
+DOCKER_VOLUME=~/docker-volume
 
 VOLUME_INITSQL=init-sql
 VOLUME_WEBAPPS=webapps
@@ -28,13 +28,11 @@ function git_update(){
     if [ ! -d $1 ]; then
         REPO=`echo "${GIT_REPO_TPL}" | sed "s/_NAME_/"$1"/g"`
         git clone ${REPO}
-	git checkout dev
-    else
-	cd $1
-	git pull --rebase -v
-	git checkout dev
-	cd ..
     fi
+    cd $1
+	git checkout dev
+	git pull --rebase -v
+	cd -
 }
 
 function npm_build(){
@@ -66,7 +64,6 @@ echo -n "Create volume dirs ... "
 mkdir -p ${DOCKER_VOLUME}
 cd ${DOCKER_VOLUME}
 for D in ${VOLUME_DIRS[*]}; do
-#    echo ${D}
     mkdir -p ${D}
 done
 echo "done"
