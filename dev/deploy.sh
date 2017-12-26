@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 ############################ Configuration #################################
 WORK_DIR=$(cd "$(dirname "$0")"; pwd)
@@ -30,7 +31,7 @@ function git_update(){
         git clone ${REPO}
     fi
     cd $1
-	git checkout dev
+	git checkout dev || true
 	git pull --rebase -v
 	cd -
 }
@@ -38,7 +39,7 @@ function git_update(){
 function npm_build(){
     cd ${REPOS_DIR}/$1
     npm install
-    npm run build
+    npm build
     cd -
 }
 
@@ -46,16 +47,6 @@ function mvn_build(){
     cd ${REPOS_DIR}/$1
     mvn clean package -Pdocker
     cd -
-}
-
-function deploy_static(){
-    rm -rfv $2/*
-    cp -rfv ${REPOS_DIR}/$1/build/* $2/
-}
-
-function deploy_service(){
-	rm -rfv $2/*
-    cp -rfv ${REPOS_DIR}/$1/target/*.war $2
 }
 
 ############################ Main process #################################
@@ -85,10 +76,14 @@ mvn_build "web-service"
 set +e
 
 echo "Deploy static files ... "
-deploy_static "web-static" "${DOCKER_VOLUME}/${VOLUME_HTML}"
+rm -rfv ${DOCKER_VOLUME}/${VOLUME_HTML}/*
+cp -rfv ${REPOS_DIR}/web-static/build/* ${DOCKER_VOLUME}/${VOLUME_HTML}/
+cp -rfv ${REPOS_DIR}/web-service/target/web/static ${DOCKER_VOLUME}/${VOLUME_HTML}/
+
 
 echo "Deploy service files ... "
-deploy_service "web-service" "${DOCKER_VOLUME}/${VOLUME_WEBAPPS}"
+rm -rfv ${DOCKER_VOLUME}/${VOLUME_WEBAPPS}/*
+cp -rfv ${REPOS_DIR}/web-service/target/*.war ${DOCKER_VOLUME}/${VOLUME_WEBAPPS}/
 
 echo "Deploy config files ... "
 rm -rf ${DOCKER_VOLUME}/${VOLUME_INITSQL}/*.sql
@@ -108,5 +103,4 @@ echo "done"
 echo "Start docker-compose ... "
 cd ${WORK_DIR}
 docker-compose -p schoolpal down
-#docker-compose pull
 docker-compose -p schoolpal up -d
