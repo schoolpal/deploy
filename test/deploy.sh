@@ -6,7 +6,7 @@ WORK_DIR=$(cd "$(dirname "$0")"; pwd)
 DEPLOY_ROOT=${WORK_DIR}/../
 REPOS_DIR=${DEPLOY_ROOT}/repos
 
-DOCKER_VOLUME=/opt/docker-volume
+DOCKER_VOLUME=~/docker-volume
 
 VOLUME_INITSQL=init-sql
 VOLUME_DATA=data
