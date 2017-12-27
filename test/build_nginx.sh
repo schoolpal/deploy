@@ -10,7 +10,7 @@ PROJECT_NAME=schoolpal
 TS=`TZ=Asia/Shanghai date +%Y%m%d%H%M%S`
 
 GIT_REPO_TPL=https://github.com/${PROJECT_NAME}/_NAME_.git
-GIT_REPOS=(web-static data)
+GIT_REPOS=(web-static web-service data)
 
 DOCKER_REPO=${PROJECT_NAME}
 DOCKER_USER=dinner3000
@@ -65,7 +65,8 @@ npm_build "web-static"
 
 echo "Deploy static files ... "
 rm -rf ${NGINX_IMG_DIR}/public || true
-cp -rfv ${REPOS_DIR}/web-static/build ${NGINX_IMG_DIR}/build
+cp -rfv ${REPOS_DIR}/web-static/build ${NGINX_IMG_DIR}/
+cp -rfv ${REPOS_DIR}/web-service/src/main/webapp/static/tests ${NGINX_IMG_DIR}/
 
 echo "Build docker images ... "
 docker login --username=${DOCKER_USER} --password=${DOCKER_PASS}
