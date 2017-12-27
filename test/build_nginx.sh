@@ -25,13 +25,11 @@ function git_update(){
     if [ ! -d $1 ]; then
         REPO=`echo "${GIT_REPO_TPL}" | sed "s/_NAME_/"$1"/g"`
         git clone ${REPO}
-        git checkout dev || true
-    else
-	cd $1
-	git pull --rebase -v
-	git checkout dev || true
-	cd ..
     fi
+    cd $1
+	git checkout dev || true
+	git pull --rebase -v
+	cd -
 }
 
 function npm_build(){
