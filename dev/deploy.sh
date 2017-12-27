@@ -17,7 +17,9 @@ VOLUME_NGINXCONF=nginx.conf
 
 VOLUME_DIRS="${VOLUME_INITSQL} ${VOLUME_WEBAPPS} ${VOLUME_HTML} ${VOLUME_CONF} ${VOLUME_LOGS}"
 
-GIT_REPO_TPL=https://github.com/schoolpal/_NAME_.git
+PROJECT_NAME=schoolpal
+
+GIT_REPO_TPL=https://github.com/${PROJECT_NAME}/_NAME_.git
 GIT_REPOS=(web-static web-service data)
 
 DOCKER_COMPOSE_FILE_TPL=${WORK_DIR}/docker-compose.tpl.yml
@@ -99,5 +101,6 @@ echo "done"
 
 echo "Start docker-compose ... "
 cd ${WORK_DIR}
-docker-compose -p schoolpal down
-docker-compose -p schoolpal up -d
+docker-compose pull
+docker-compose -p ${PROJECT_NAME} down
+docker-compose -p ${PROJECT_NAME} up -d

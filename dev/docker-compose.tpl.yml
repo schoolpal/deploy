@@ -12,7 +12,7 @@ services:
     depends_on:
       - web
   web:
-    image: tomcat:9
+    image: tomcat:9.0.2-jre8
     ports:
       - "8080:8080"
     volumes:
@@ -22,9 +22,9 @@ services:
       - db
       - redis
   redis:
-    image: redis:3
+    image: redis:3.2.11
   db:
-    image: mysql:5
+    image: mysql:5.7.20
     environment:
       MYSQL_ROOT_PASSWORD: 1234abcd
       MYSQL_DATABASE: schoolpal
