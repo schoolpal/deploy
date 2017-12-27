@@ -45,6 +45,7 @@ function docker_build(){
     docker tag ${PROJECT_NAME}/$2:${TS} ${PROJECT_NAME}/$2:latest
     docker push ${PROJECT_NAME}/$2:${TS}
     docker push ${PROJECT_NAME}/$2:latest
+    docker rmi -f ${PROJECT_NAME}/$2:${TS}
     cd -
 }
 
