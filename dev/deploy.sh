@@ -39,7 +39,7 @@ function git_update(){
 function npm_build(){
     cd ${REPOS_DIR}/$1
     npm install
-    npm build
+    npm run build
     cd -
 }
 
