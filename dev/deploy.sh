@@ -29,9 +29,9 @@ DOCKER_COMPOSE_FILE=${WORK_DIR}/docker-compose.yml
 ############################ Functions #################################
 function self_update(){
     cd ${WORK_DIR}
-    OUT_OF_DATE=`git remote show origin |grep "out of date" |grep dev`
+    echo "Check self-update ... "
+    OUT_OF_DATE=`git remote show origin |grep "out of date" |grep dev` || true
     if [ ! -z "${OUT_OF_DATE}" ]; then
-        echo "Self update ... "
         git pull
         echo "Re-execute ... "
         exec $0 "$@" &
