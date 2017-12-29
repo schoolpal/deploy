@@ -27,6 +27,21 @@ DOCKER_COMPOSE_FILE=${WORK_DIR}/docker-compose.yml
 
 
 ############################ Functions #################################
+function self_update(){
+    cd ${WORK_DIR}
+    OUT_OF_DATE=`git remote show origin |grep "out of date" |grep dev`
+    if [ ! -z "${OUT_OF_DATE}" ]; then
+        echo "Self update ... "
+        git pull
+        echo "Re-execute ... "
+        exec $0 "$@" &
+        exit 0
+    else
+        echo "No update, continue ... "
+    fi
+    cd -
+}
+
 function git_update(){
     if [ ! -d $1 ]; then
         REPO=`echo "${GIT_REPO_TPL}" | sed "s/_NAME_/"$1"/g"`
@@ -52,6 +67,7 @@ function mvn_build(){
 }
 
 ############################ Main process #################################
+self_update
 
 echo -n "Create volume dirs ... "
 mkdir -p ${DOCKER_VOLUME}
