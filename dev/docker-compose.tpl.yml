@@ -14,7 +14,7 @@ services:
   web:
     image: tomcat:9.0.2-jre8
     ports:
-      - "8080:8080"
+      - "18080:8080"
     volumes:
       - _VOLUME_WEBAPPS_:/usr/local/tomcat/webapps
       - _VOLUME_LOGS_:/usr/local/tomcat/logs
@@ -23,6 +23,8 @@ services:
       - redis
   redis:
     image: redis:3.2.11
+    ports:
+      - "16379:6379"
   db:
     image: mysql:5.7.20
     environment:
@@ -30,6 +32,8 @@ services:
       MYSQL_DATABASE: schoolpal
       MYSQL_USER: schoolpal
       MYSQL_PASSWORD: schoolpal
+    ports:
+      - "13306:3306"
     volumes:
       - _VOLUME_INITSQL_:/docker-entrypoint-initdb.d:ro
 
