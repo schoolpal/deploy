@@ -33,8 +33,8 @@ function git_update(){
         git clone ${REPO}
     fi
     cd $1
-	git checkout dev || true
 	git pull --rebase -v
+	git checkout dev || true
 	cd -
 }
 
