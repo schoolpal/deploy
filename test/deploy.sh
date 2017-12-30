@@ -153,7 +153,7 @@ if [ -f ${DOCKER_COMPOSE_FILE} ]; then
     echo "already exits, skip. (delete it if you want to re-generate)"
 else
     if [ ${REFRESH_DATABASE} == "Y" ]; then
-        VOLUME_INITSQL_LINE=" - $(echo "${DOCKER_VOLUME}/${VOLUME_INITSQL}" | sed 's/\//\\\//g'):/docker-entrypoint-initdb.d:ro"
+        VOLUME_INITSQL_LINE=$(echo "${DOCKER_VOLUME}/${VOLUME_INITSQL}:/docker-entrypoint-initdb.d:ro" | sed 's/\//\\\//g')
     else
         VOLUME_INITSQL_LINE=""
     fi
@@ -164,7 +164,7 @@ else
     sed 's/_PORT_MYSQL_/'${PORT_MYSQL}'/g' | \
     sed 's/_VOLUME_LOGS_/'$(echo "${DOCKER_VOLUME}/${VOLUME_LOGS}" | sed 's/\//\\\//g')'/g' | \
     sed 's/_VOLUME_DATA_/'$(echo "${DOCKER_VOLUME}/${VOLUME_DATA}" | sed 's/\//\\\//g')'/g' | \
-    sed 's/_VOLUME_INITSQL_/'${VOLUME_INITSQL_LINE}'/g' \
+    sed 's/_VOLUME_INITSQL_/  - '${VOLUME_INITSQL_LINE}'/g' \
     > ${DOCKER_COMPOSE_FILE}
     echo "done"
 fi
