@@ -19,9 +19,23 @@ DOCKER_COMPOSE_FILE_TPL=${WORK_DIR}/docker-compose.tpl.yml
 DOCKER_COMPOSE_FILE=${WORK_DIR}/docker-compose.yml
 
 ############################ Functions #################################
-#None
+function self_update(){
+    cd ${WORK_DIR}
+    echo "Check self-update ... "
+    OUT_OF_DATE=`git remote show origin |grep "out of date" |grep dev` || true
+    if [ ! -z "${OUT_OF_DATE}" ]; then
+        git pull
+        echo "Re-execute ... "
+        exec $0 "$@" &
+        exit 0
+    else
+        echo "No update, continue ... "
+    fi
+    cd -
+}
 
 ############################ Main process #################################
+self_update
 
 echo -n "Create volume dirs ... "
 mkdir -p ${DOCKER_VOLUME}
@@ -32,11 +46,15 @@ done
 echo "done"
 
 echo -n "Generate docker-compose file ... "
-cat ${DOCKER_COMPOSE_FILE_TPL} | \
-sed 's/_VOLUME_LOGS_/'$(echo "${DOCKER_VOLUME}/${VOLUME_LOGS}" | sed 's/\//\\\//g')'/g' | \
-sed 's/_VOLUME_DATA_/'$(echo "${DOCKER_VOLUME}/${VOLUME_DATA}" | sed 's/\//\\\//g')'/g' \
- > ${DOCKER_COMPOSE_FILE}
-echo "done"
+if [ ! -f ${DOCKER_COMPOSE_FILE} ]; then
+    cat ${DOCKER_COMPOSE_FILE_TPL} | \
+    sed 's/_VOLUME_LOGS_/'$(echo "${DOCKER_VOLUME}/${VOLUME_LOGS}" | sed 's/\//\\\//g')'/g' | \
+    sed 's/_VOLUME_DATA_/'$(echo "${DOCKER_VOLUME}/${VOLUME_DATA}" | sed 's/\//\\\//g')'/g' \
+    > ${DOCKER_COMPOSE_FILE}
+    echo "done"
+else
+    echo -n "already exits, skip. (delete it if you want to re-generate)"
+fi
 
 echo "Start docker-compose ... "
 cd ${WORK_DIR}
