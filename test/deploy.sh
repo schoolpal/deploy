@@ -34,13 +34,13 @@ function help(){
     echo "schoolpal-deploy [(-h|--help)] [(-v|--docker-volume) string] [(-n|--nginx-port) integer] [(-t|--tomcat-port) integer] [(-r|--redis-port) integer] [(-m|--mysql-port) integer] [(-p|--project-name) string] [--refresh-database]";
     echo "Options:";
     echo "-h or --help: Displays this information.";
-    echo "-v or --docker-volume string: Root path of docker volumes, default: ~/docker-volume.";
-    echo "-n or --nginx-port integer: Nginx port mapping, default: 80.";
-    echo "-t or --tomcat-port integer: Tomcat port mapping, default: 8080.";
-    echo "-r or --redis-port integer: Redis port mapping, default: 6379.";
-    echo "-m or --mysql-port integer: Mysql port mapping, default: 3306.";
-    echo "-p or --project-name string: Docker-compose project name, default: schoolpal.";
-    echo "--refresh-database: Reset and restore database with standard data.";
+    echo "-v or --docker-volume string: Root path of docker volumes, default: ${DOCKER_VOLUME}.";
+    echo "-n or --nginx-port integer: Nginx port mapping, default: ${PORT_NGINX}.";
+    echo "-t or --tomcat-port integer: Tomcat port mapping, default: ${PORT_TOMCAT}.";
+    echo "-r or --redis-port integer: Redis port mapping, default: ${PORT_REDIS}.";
+    echo "-m or --mysql-port integer: Mysql port mapping, default: ${MYSQL}.";
+    echo "-p or --project-name string: Docker-compose project name, default: ${PROJECT_NAME}.";
+    echo "--refresh-database: Reset and restore database with standard data, default: ${REFRESH_DATABASE}.";
     exit 1;
 }
  
