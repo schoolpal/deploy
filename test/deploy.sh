@@ -44,9 +44,6 @@ function help(){
     exit 1;
 }
  
-# Declare vars. Flags initalizing to 0.
-refresh-database=0;
- 
 # Execute getopt
 ARGS=$(getopt -o "hv:n:t:r:m:p:" -l "help,docker-volume:,nginx-port:,tomcat-port:,redis-port:,mysql-port:,project-name:,refresh-database" -n "schoolpal-deploy" -- "$@");
  
