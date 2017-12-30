@@ -125,7 +125,7 @@ done
 function self_update(){
     cd ${WORK_DIR}
     echo "Check self-update ... "
-    OUT_OF_DATE=`git remote show origin |grep "out of date" |grep dev` || true
+    OUT_OF_DATE=`git remote show origin |grep "out of date" |grep master` || true
     if [ ! -z "${OUT_OF_DATE}" ]; then
         git pull
         echo "Re-execute ... "
