@@ -24,7 +24,7 @@ TOMCAT_IMG_DIR=${WORK_DIR}/tomcat
 function git_update(){
     if [ ! -d $1 ]; then
         REPO=`echo "${GIT_REPO_TPL}" | sed "s/_NAME_/"$1"/g"`
-        git clone ${REPO}
+        git clone -b dev --depth=1 ${REPO}
     fi
     cd $1
 	git pull --rebase -v
