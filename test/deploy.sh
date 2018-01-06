@@ -35,6 +35,7 @@ function self_update(){
     if [ ! -z "${OUT_OF_DATE}" ]; then
         git pull
         echo "Re-execute ... "
+        cd -
         exec $0 "$@" &
         exit 0
     else
