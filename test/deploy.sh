@@ -189,6 +189,7 @@ else
         echo "Deploy config files ... "
         rm -rf ${DOCKER_VOLUME}/${VOLUME_INITSQL}/*.sql
         cp -fv ${REPOS_DIR}/data/*.sql ${DOCKER_VOLUME}/${VOLUME_INITSQL}/
+        rm -rf ${DOCKER_VOLUME}/${VOLUME_DATA}
 
         sed -i 's/_VOLUME_INITSQL_/  - '$(echo "${DOCKER_VOLUME}/${VOLUME_INITSQL}:/docker-entrypoint-initdb.d:ro" | sed 's/\//\\\//g')'/g' \
         ${DOCKER_COMPOSE_FILE}
